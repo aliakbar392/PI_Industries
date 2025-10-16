@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PI Nexus • Idea #1 Prototype v3</title>
+  <style>
+    :root{
+      --bg:#ffffff;--bg-accent:#f2f7ff;--card:#ffffff;--muted:#eef3ff;--text:#0b1b34;--text-dim:#4a5e85;
+      --accent:#2f6bff;--accent-2:#2ec5ff;--warn:#ff9f3b;--danger:#e24a4a;--ok:#1fa97a;
+      --border:#d7e3ff;--shadow:0 8px 24px rgba(17,53,132,.08);
+      --radius:16px;--radius-sm:12px;--radius-lg:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:radial-gradient(900px 420px at 0% -10%, var(--bg-accent) 0%, var(--bg) 55%), var(--bg); color:var(--text); font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,"Helvetica Neue",Arial}
+    .app{max-width:1200px; margin:28px auto; padding:0 20px}
+    header{display:flex; gap:16px; align-items:center; margin-bottom:14px}
+    .brandbar{display:flex; gap:12px; align-items:center}
+    .brand{height:36px; width:auto; display:block}
+    .logo-sm{height:24px; width:auto; vertical-align:middle; margin-left:8px}
+    h1{font-size:20px; margin:0; letter-spacing:.2px}
+    .tabs{display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 18px}
+    .tab{padding:10px 14px; background:#f4f8ff; border:1px solid var(--border); border-radius:999px; color:var(--text-dim); cursor:pointer; user-select:none; transition:.2s transform,.2s background}
+    .tab[aria-selected="true"]{background:#ebf2ff; color:#143a8b; box-shadow:var(--shadow)}
+    .grid{display:grid; grid-template-columns:repeat(12,1fr); gap:16px}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px}
+    .card h2{margin:0 0 10px; font-size:18px}
+    .card h3{margin:16px 0 8px; font-size:16px; color:var(--text-dim)}
+    label{display:block; font-size:13px; color:var(--text-dim); margin:8px 0 6px}
+    input, select, textarea{width:100%; padding:11px 12px; border-radius:12px; border:1px solid var(--border); background:#fff; color:var(--text); outline:none}
+    input:focus, select:focus, textarea:focus{border-color:#9bb8ff; box-shadow:0 0 0 3px rgba(47,107,255,.18)}
+    .row{display:grid; grid-template-columns:repeat(12,1fr); gap:12px}
+    .col-6{grid-column:span 6}
+    .col-4{grid-column:span 4}
+    .col-3{grid-column:span 3}
+    .col-12{grid-column:span 12}
+    .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; border:1px solid var(--border); background:#f5f9ff; color:#123264; cursor:pointer; transition:.2s transform,.2s background}
+    .btn:hover{transform:translateY(-1px); background:#edf4ff}
+    .btn.primary{background:linear-gradient(135deg,var(--accent),#4b82ff); border-color:#4b82ff; color:#fff}
+    .btn.ghost{background:#fff}
+    .btn.alert{background:linear-gradient(135deg,#ff7b7b,#ff4b4b); border-color:#ff4b4b; color:#fff}
+    .pill{display:inline-block; padding:5px 10px; border-radius:999px; font:12px/1.2 system-ui; border:1px solid var(--border); color:var(--text-dim); background:#f7fbff}
+    .summary{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:12px}
+    .kpi{background:#f9fbff; border:1px dashed var(--border); border-radius:14px; padding:10px 12px}
+    .kpi strong{display:block; font-size:18px}
+    .kpi small{color:var(--text-dim)}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .danger{color:var(--danger)}
+    .timeline{display:flex; gap:10px; align-items:center; overflow-x:auto; padding-bottom:6px}
+    .step{position:relative; padding:8px 12px; background:#f4f8ff; border:1px solid var(--border); border-radius:999px; white-space:nowrap}
+    .step.done{background:#e8f1ff; border-color:#b9cffd; color:#14408c}
+    .step::after{content:""; position:absolute; right:-22px; top:50%; width:24px; height:2px; background:#d7e3ff}
+    .step:last-child::after{display:none}
+    .chat{height:320px; overflow:auto; border-radius:14px; background:#f5f8ff; border:1px solid var(--border); padding:12px}
+    .bubble{max-width:82%; padding:10px 12px; margin:6px 0; border-radius:14px; display:inline-block}
+    .me{background:#e6efff; align-self:flex-end; border:1px solid #b9cffd}
+    .bot{background:#ffffff; border:1px solid var(--border)}
+    .chatwrap{display:flex; flex-direction:column; height:100%}
+    .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+    .quick{font-size:13px}
+    .composer{display:flex; gap:8px; margin-top:8px}
+    .composer input{flex:1; padding:11px 12px; border-radius:12px; border:1px solid var(--border)}
+    .chiprow{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px}
+    .chiprow .chip{padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:#f5f9ff; cursor:pointer}
+    .table{width:100%; border-collapse:separate; border-spacing:0 8px}
+    .table th{color:var(--text-dim); font-weight:600; text-align:left; font-size:12px}
+    .table td{background:#fff; border:1px solid var(--border); padding:10px 12px; border-radius:12px}
+    .notice{font-size:12px; color:#3659a2}
+    .footer{margin-top:14px; font-size:12px; color:#5b739f}
+    @media (max-width:960px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.col-3,.col-4,.col-6,.col-12{grid-column:span 1}.summary{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="app" role="application">
+    <header>
+      <div class="brandbar">
+        <img class="brand" src="assets/immunoact-logo.png" alt="ImmunoACT logo"/>
+        <img class="brand" src="assets/pi-logo.png" alt="PI logo"/>
+      </div>
+      <div>
+        <h1>PI Nexus • Idea #1 – Patient, Doctor & R&D</h1>
+        <div class="notice">Prototype • Front‑end only • Data stored locally (no PHI uploaded)</div>
+      </div>
+      <div style="flex:1"></div>
+      <div class="actions">
+        <button class="btn" id="comfortBtn">Comfort Mode</button>
+        <button class="btn alert" id="helpBtn">I’m not feeling well</button>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Primary Views">
+      <button class="tab" role="tab" aria-selected="true" aria-controls="view-patient" id="tab-patient">Patient</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="view-doctor" id="tab-doctor">Doctor</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="view-rnd" id="tab-rnd">R&D</button>
+    </nav>
+
+    <!-- PATIENT VIEW -->
+    <section id="view-patient" role="tabpanel" aria-labelledby="tab-patient">
+      <div class="grid">
+        <div class="card" style="grid-column:span 7">
+          <h2>Affordability & Coverage</h2>
+          <div class="pill" id="elig-pill">Assistance eligibility: <strong id="elig-label">Unknown</strong></div>
+          <div class="row" style="margin-top:10px">
+            <div class="col-6">
+              <label>Insurance Plan</label>
+              <select id="plan">
+                <option value="pvt:HDFC ERGO">HDFC ERGO</option>
+                <option value="pvt:ICICI Lombard">ICICI Lombard</option>
+                <option value="pvt:Star Health">Star Health</option>
+                <option value="pvt:SBI General">SBI General</option>
+                <option value="pvt:Niva Bupa">Niva Bupa (Max Bupa)</option>
+                <option value="pvt:Bajaj Allianz">Bajaj Allianz</option>
+                <option value="pvt:New India Assurance">New India Assurance</option>
+                <option value="pvt:Oriental Insurance">Oriental Insurance</option>
+                <option value="pvt:LIC">LIC</option>
+                <option value="gov:CGHS/State">CGHS / State Scheme</option>
+                <option value="none">Uninsured / Self-pay</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label>Household Income (₹/year)</label>
+              <input id="income" type="number" placeholder="e.g., 600000" />
+            </div>
+            <div class="col-4">
+              <label>Drug Cost per Fill (₹)</label>
+              <input id="drugCost" type="number" placeholder="e.g., 18000" />
+            </div>
+            <div class="col-4">
+              <label>Deductible (₹)</label>
+              <input id="deductible" type="number" placeholder="e.g., 20000" />
+            </div>
+            <div class="col-4">
+              <label>Deductible Met (₹)</label>
+              <input id="dedMet" type="number" placeholder="e.g., 5000" />
+            </div>
+            <div class="col-4">
+              <label>Coinsurance (%)</label>
+              <input id="coins" type="number" placeholder="e.g., 20" />
+            </div>
+            <div class="col-4">
+              <label>OOP Max (₹)</label>
+              <input id="oopmax" type="number" placeholder="e.g., 60000" />
+            </div>
+            <div class="col-4">
+              <label>OOP Spent to Date (₹)</label>
+              <input id="oopspent" type="number" placeholder="e.g., 8000" />
+            </div>
+            <div class="col-12">
+              <button class="btn primary" id="calcBtn">Estimate Out‑of‑Pocket</button>
+              <button class="btn ghost" id="resetAff">Reset</button>
+            </div>
+          </div>
+          <div class="summary" aria-live="polite" id="affSummary" hidden>
+            <div class="kpi"><small>Per‑Fill Patient Pays</small><strong id="k1">₹0</strong></div>
+            <div class="kpi"><small>Insurer Pays</small><strong id="k2">₹0</strong></div>
+            <div class="kpi"><small>OOP Remaining to Max</small><strong id="k3">₹0</strong></div>
+            <div class="kpi"><small>Assistance Impact</small><strong id="k4">—</strong></div>
+          </div>
+        </div>
+
+        <div class="card" style="grid-column:span 5">
+          <h2>PI Assistance – Quick Check</h2>
+          <div class="row">
+            <div class="col-6">
+              <label>Diagnosis</label>
+              <select id="dx">
+                <option selected>Oncology</option>
+                <option>Autoimmune</option>
+                <option>Rare Disease</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label>Resident of India?</label>
+              <select id="res"><option>Yes</option><option>No</option></select>
+            </div>
+            <div class="col-12">
+              <label>Other manufacturer aid active?</label>
+              <select id="otherAid"><option>No</option><option>Yes</option></select>
+            </div>
+            <div class="col-12">
+              <button class="btn primary" id="checkElig">Check Eligibility</button>
+            </div>
+          </div>
+          <div id="eligResult" class="kpi" style="margin-top:12px">
+            <small>Status</small>
+            <strong id="eligText">Complete the form to check.</strong>
+          </div>
+          <div class="notice" style="margin-top:8px">Prototype rules only. Your care team will confirm official program details.</div>
+        </div>
+
+        <div class="card" style="grid-column:span 7">
+          <h2>Daily Patient Tracker (Chatbot)</h2>
+          <div class="chatwrap">
+            <div id="chat" class="chat" aria-live="polite"></div>
+            <div class="actions">
+              <button class="btn" id="startCheck">Start Today’s Check‑in</button>
+              <button class="btn ghost" id="speakBtn" title="Read messages aloud">🔊 Read out</button>
+              <button class="btn ghost" id="exportData">Export (JSON)</button>
+              <span class="pill" id="checkinStatus">No entry today</span>
+            </div>
+            <div class="composer" aria-label="Chat input">
+              <input id="msg" type="text" placeholder="Type… e.g., ‘start’, ‘pain 4’, ‘temp 37.2’, ‘history’"/>
+              <button class="btn" id="sendBtn">Send</button>
+            </div>
+          </div>
+          <h3>Recent Entries</h3>
+          <table class="table" id="recentTbl" aria-label="Recent tracker entries">
+            <thead><tr><th>Date</th><th>Pain</th><th>Side‑effects</th><th>Temperature</th><th>Notes</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="card" style="grid-column:span 5">
+          <h2>Vial Journey <img src="assets/tmc-logo.png" alt="TMC logo" class="logo-sm"/></h2>
+          <div class="timeline" id="timeline"></div>
+          <div class="row" style="margin-top:10px">
+            <div class="col-12">
+              <button class="btn" id="advStep">Advance Status</button>
+              <button class="btn ghost" id="resetVial">Reset</button>
+              <span class="pill" id="etaPill">ETA: ~3–5 days</span>
+            </div>
+          </div>
+          <p class="footer">High‑level milestones only (Lab → QC → Cold Chain → Pharmacy → Ward). No exact GPS stored.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DOCTOR VIEW -->
+    <section id="view-doctor" role="tabpanel" aria-labelledby="tab-doctor" hidden>
+      <div class="grid">
+        <div class="card" style="grid-column:span 6">
+          <h2>Enroll a Patient</h2>
+          <label>Patient ID (pseudonymized)</label>
+          <input placeholder="e.g., PT-1042" />
+          <label>Therapy Regimen</label>
+          <input placeholder="e.g., PI‑X01 100mg q2w" />
+          <label>Requested Start Date</label>
+          <input type="date" />
+          <button class="btn primary" style="margin-top:10px">Submit Enrollment</button>
+          <p class="footer">Prototype only; not connected to a backend.</p>
+        </div>
+        <div class="card" style="grid-column:span 6">
+          <h2>Orders & Vials</h2>
+          <div class="kpi"><small>Open Orders</small><strong>2</strong></div>
+          <div class="kpi"><small>Next Delivery Window</small><strong>T+2 days</strong></div>
+          <div class="kpi"><small>Cold‑Chain Integrity</small><strong class="ok">OK</strong></div>
+        </div>
+        <div class="card" style="grid-column:span 12">
+          <h2>Safety & AE Reporting</h2>
+          <label>Brief description</label>
+          <textarea rows="4" placeholder="e.g., Grade 2 rash on day 3; managed with topical steroid."></textarea>
+          <button class="btn" style="margin-top:10px">Save Draft</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- R&D VIEW -->
+    <section id="view-rnd" role="tabpanel" aria-labelledby="tab-rnd" hidden>
+      <div class="grid">
+        <div class="card" style="grid-column:span 8">
+          <h2>Anonymized Insights (Preview)</h2>
+          <p>Future dashboard for de‑identified signals from trackers and supply milestones.</p>
+          <ul>
+            <li>Symptom trends & adherence flags</li>
+            <li>Cold‑chain exception clusters</li>
+            <li>Eligibility funnels & affordability gaps</li>
+          </ul>
+          <div class="notice">Population‑level only; privacy‑by‑design.</div>
+        </div>
+        <div class="card" style="grid-column:span 4">
+          <h2>Data Governance</h2>
+          <p class="notice">Data stays in your browser (localStorage). For production, add consent & audit trails.</p>
+          <button class="btn danger" id="wipeAll" style="border-color:#c66">Wipe Local Data</button>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer">© 2025 PI Nexus Prototype • Accessibility: keyboard tabs, ARIA live regions, Comfort Mode.</p>
+  </div>
+
+  <script>
+    // ==== Tabs ====
+    const tabs = document.querySelectorAll('.tab');
+    const views = { patient: document.getElementById('view-patient'), doctor: document.getElementById('view-doctor'), rnd: document.getElementById('view-rnd') };
+    tabs.forEach(t=>t.addEventListener('click',()=>{ tabs.forEach(b=>b.setAttribute('aria-selected','false')); t.setAttribute('aria-selected','true'); Object.values(views).forEach(v=>v.hidden=true); const id = t.id.replace('tab-',''); views[id].hidden=false; }));
+
+    // ==== Helpers ====
+    const q = id=>document.getElementById(id);
+    const money = v=>`₹${Number(v||0).toLocaleString('en-IN')}`;
+    function todayKey(){ const d=new Date(); return d.toISOString().slice(0,10); }
+
+    // ==== Affordability Calculator + Assistance Rules (simple heuristic) ====
+    function estimate(){
+      const planRaw = q('plan').value; const [planType] = planRaw.split(':');
+      const income = +q('income').value||0; const cost = +q('drugCost').value||0; const ded = +q('deductible').value||0; const met = +q('dedMet').value||0; const coins = (+q('coins').value||0)/100; const oopmax = +q('oopmax').value||0; const oopspent = +q('oopspent').value||0;
+      let patient = 0, insurer = 0; const dedRemain = Math.max(0, ded - met); const applyDed = Math.min(cost, dedRemain); patient += applyDed; const rem = cost - applyDed; const coinsPart = rem * coins; patient += coinsPart; insurer = cost - patient; const oopRemain = Math.max(0, oopmax - oopspent); if(oopRemain>0) patient = Math.min(patient, oopRemain);
+      q('k1').textContent = money(patient.toFixed(0)); q('k2').textContent = money(Math.max(0, insurer).toFixed(0)); q('k3').textContent = money(Math.max(0, oopmax - (oopspent + patient)).toFixed(0));
+      const assist = (function(){ let eligible = (income<=800000 && patient>=10000) || planType==='none'; const relief = eligible ? Math.min(patient, 25000) : 0; return {eligible, relief}; })();
+      q('k4').textContent = assist.eligible ? `Support up to ${money(assist.relief)}` : 'Not eligible (prototype)'; q('elig-label').textContent = assist.eligible ? 'Likely Eligible' : 'Not Eligible'; q('elig-pill').style.color = assist.eligible ? 'var(--ok)' : 'var(--text-dim)';
+      q('affSummary').hidden = false;
+      localStorage.setItem('affordability', JSON.stringify({plan:planRaw,income,cost,ded,met,coins:coins*100,oopmax,oopspent,ts:Date.now()}));
+    }
+    q('calcBtn').addEventListener('click', estimate);
+    q('resetAff').addEventListener('click', ()=>{ ['income','drugCost','deductible','dedMet','coins','oopmax','oopspent'].forEach(id=>q(id).value=''); q('affSummary').hidden = true; q('elig-label').textContent='Unknown'; q('elig-pill').style.color='var(--text-dim)'; localStorage.removeItem('affordability'); });
+    q('checkElig').addEventListener('click',()=>{ const planType=q('plan').value.split(':')[0]; const income=+q('income').value||0; const perFill=+String(q('k1').textContent).replace(/[^\d]/g,'')||0; const other = q('otherAid').value==='Yes'; const res = q('res').value==='Yes'; const dx = q('dx').value; let eligible=(perFill>=10000 && income<=800000) || planType==='none'; if(!res||other||dx==='Other') eligible=false; const relief=eligible? Math.min(perFill,25000):0; q('eligText').textContent = eligible ? `Likely eligible • Estimated support up to ${money(relief)}` : 'Not eligible based on inputs (prototype).'; q('elig-label').textContent = eligible ? 'Likely Eligible' : 'Not Eligible'; q('elig-pill').style.color = eligible ? 'var(--ok)' : 'var(--danger)'; });
+    (function initAff(){ const saved = localStorage.getItem('affordability'); if(saved){ const v = JSON.parse(saved); q('plan').value=v.plan; q('income').value=v.income; q('drugCost').value=v.cost; q('deductible').value=v.ded; q('dedMet').value=v.met; q('coins').value=v.coins; q('oopmax').value=v.oopmax; q('oopspent').value=v.oopspent; estimate(); } })();
+
+    // ==== Chatbot Daily Tracker ====
+    const chat = q('chat');
+    const qs = [
+      {id:'mood', text:'How are you feeling today? (🙂 / 😐 / 🙁)', type:'text'},
+      {id:'pain', text:'Pain 0–10?', type:'number'},
+      {id:'temp', text:'Temperature in °C?', type:'number'},
+      {id:'bleed', text:'Any unusual bleeding or easy bruising? (none/mild/moderate/severe)', type:'text'},
+      {id:'se', text:'Side effects (comma‑separated): fever, nausea, mouth sores, rash, fatigue, none', type:'text'},
+      {id:'med', text:'Did you take today\'s dose? (yes/no)', type:'text'},
+      {id:'hydrate', text:'Glasses of water today? (number)', type:'number'},
+      {id:'note', text:'Anything else you want to note?', type:'text'}
+    ];
+    function addBubble(text, who='bot'){ const div=document.createElement('div'); div.className='bubble '+(who==='me'?'me':'bot'); div.textContent=text; chat.appendChild(div); chat.scrollTop=chat.scrollHeight; if(window.speechSynthesis && who==='bot'){ const u=new SpeechSynthesisUtterance(text); u.rate=1; u.pitch=1; speechSynthesis.speak(u);} }
+    function clearChat(){ chat.innerHTML=''; }
+    function getLog(){ return JSON.parse(localStorage.getItem('tracker')||'{}'); }
+    function setLog(log){ localStorage.setItem('tracker', JSON.stringify(log)); }
+
+    function renderRecent(){ const tbody = document.querySelector('#recentTbl tbody'); tbody.innerHTML=''; const entries = Object.entries(getLog()).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,7); entries.forEach(([date,rec])=>{ const tr=document.createElement('tr'); const td=v=>{const x=document.createElement('td'); x.textContent=v??''; return x}; tr.append(td(date), td(rec.pain), td(rec.se), td(rec.temp), td(rec.note)); tbody.appendChild(tr); }); const hasToday = getLog()[todayKey()]; q('checkinStatus').textContent = hasToday ? 'Completed today' : 'No entry today'; q('checkinStatus').style.color = hasToday ? 'var(--ok)' : 'var(--text-dim)'; }
+
+    function evaluateRules(resp){ const pain = Number(resp.pain||0); const temp = Number(resp.temp||0); const se = String(resp.se||'').toLowerCase(); const bleed = String(resp.bleed||'none').toLowerCase(); const med = String(resp.med||'').toLowerCase(); let alerts=[]; if(pain>=7) alerts.push('High pain reported (≥7). Consider contacting your care team.'); if(temp>=38) alerts.push('Fever ≥38°C. This can be serious. Contact clinic.'); if(bleed==='moderate' || bleed==='severe') alerts.push('Bleeding/bruising noted. Seek clinical advice now.'); if(se.includes('mouth sores')) alerts.push('Mouth sores noted. Rinse with salt water; inform clinic if severe.'); if(med==='no') alerts.push('Dose missed today. Follow clinician advice before catch‑up.'); if(alerts.length){ alerts.forEach(a=>addBubble('⚠️ '+a,'bot')); } else { addBubble('Thanks! Nothing alarming today based on these answers (prototype only).','bot'); } }
+
+    let chatState = {active:false, i:0, resp:{}};
+    function clearQuick(){ document.querySelectorAll('#chat .chiprow').forEach(el=>el.remove()); }
+    function showQuick(options){ clearQuick(); const row=document.createElement('div'); row.className='chiprow'; options.forEach(t=>{ const b=document.createElement('button'); b.className='chip'; b.textContent=t; b.onclick=()=>handleUserMessage(t); row.appendChild(b); }); chat.appendChild(row); chat.scrollTop=chat.scrollHeight; }
+    function askNext(){ const qn = qs[chatState.i]; if(!qn){ const key=todayKey(); const log=getLog(); log[key]=chatState.resp; setLog(log); evaluateRules(chatState.resp); addBubble('Entry saved. Wishing you a smooth day.','bot'); renderRecent(); chatState.active=false; return; } addBubble(qn.text,'bot'); if(qn.id==='mood'){ showQuick(['🙂','😐','🙁']); } if(qn.id==='pain'){ showQuick(['0','2','4','6','8','10']); } if(qn.id==='med'){ showQuick(['yes','no']); } if(qn.id==='bleed'){ showQuick(['none','mild','moderate','severe']); } }
+    function startCheckin(){ clearChat(); clearQuick(); chatState={active:true,i:0,resp:{timestamp:Date.now()}}; addBubble('Hi! Let\'s do a quick check‑in.','bot'); askNext(); }
+
+    document.getElementById('startCheck').addEventListener('click', startCheckin);
+    document.getElementById('sendBtn').addEventListener('click',()=>{ const i=q('msg'); handleUserMessage(i.value); i.value=''; i.focus(); });
+    document.getElementById('msg').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); q('sendBtn').click(); }});
+
+    function handleUserMessage(text){ const t = String(text||'').trim(); if(!t) return; addBubble(t,'me'); if(chatState.active){ const qn = qs[chatState.i]; let val=t; if(qn && qn.type==='number'){ const m=t.match(/-?\d+(\.\d+)?/); if(m) val=m[0]; } if(qn) { chatState.resp[qn.id]=val; chatState.i++; clearQuick(); askNext(); } return; } if(/^start/i.test(t)) return startCheckin(); if(/^export/i.test(t)) return q('exportData').click(); if(/help|not feeling well/i.test(t)) return q('helpBtn')?.click(); if(/history|recent/i.test(t)){ const entries = Object.entries(getLog()).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,3).map(([d,r])=>`${d}: pain ${r.pain??'-'}, temp ${r.temp??'-'}°C`); return addBubble(entries.length? entries.join(' • ') : 'No recent entries yet.','bot'); } addBubble("Type 'start' to begin today’s check‑in, or try 'export' / 'show history'.",'bot'); }
+
+    // Text-to-speech toggle
+    q('speakBtn').addEventListener('click',()=>{ addBubble('Voice readout enabled for bot messages.','bot'); });
+
+    // Export
+    q('exportData').addEventListener('click',()=>{ const blob = new Blob([JSON.stringify(getLog(),null,2)], {type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='patient-tracker.json'; a.click(); });
+
+    renderRecent();
+
+    // ==== Vial Journey Timeline ====
+    const steps = [ 'Processing Lab Received','Quality Control Complete','Cold Chain Transit','Hospital Pharmacy Intake','Ward / Day‑care Ready' ];
+    const timeline = q('timeline');
+    function renderSteps(idx=0){ timeline.innerHTML=''; steps.forEach((s,i)=>{ const el=document.createElement('div'); el.className='step'+(i<=idx?' done':''); el.textContent=s; timeline.appendChild(el); }); }
+    function getVial(){ return JSON.parse(localStorage.getItem('vial')||'{"i":0}'); }
+    function setVial(v){ localStorage.setItem('vial', JSON.stringify(v)); }
+    function initVial(){ const v=getVial(); renderSteps(v.i); etaUpdate(v.i); }
+    function etaUpdate(i){ const eta = i<2?'~3–5 days': i===2?'~1–2 days' : i===3?'< 24 hrs' : 'Ready'; q('etaPill').textContent='ETA: '+eta; }
+    q('advStep').addEventListener('click',()=>{ let v=getVial(); v.i = Math.min(steps.length-1, (v.i||0)+1); setVial(v); renderSteps(v.i); etaUpdate(v.i); });
+    q('resetVial').addEventListener('click',()=>{ setVial({i:0}); renderSteps(0); etaUpdate(0); });
+    initVial();
+
+    // ==== Governance ====
+    q('wipeAll')?.addEventListener('click',()=>{ if(confirm('Delete affordability, tracker and vial data saved in this browser?')){ ['affordability','tracker','vial'].forEach(k=>localStorage.removeItem(k)); location.reload(); } });
+
+    // Comfort Mode
+    q('comfortBtn').addEventListener('click',()=>{ document.body.style.fontSize = getComputedStyle(document.body).fontSize==='16px' ? '18px' : '16px'; });
+    q('helpBtn').addEventListener('click',()=>{ alert('If you have fever ≥ 38°C, uncontrolled bleeding/bruising, breathing trouble, or severe weakness, contact your care team immediately.'); });
+  </script>
+</body>
+</html>
