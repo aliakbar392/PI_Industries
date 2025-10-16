@@ -1,0 +1,456 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PI Nexus • Idea#1 • Patient | Doctor | R&D (v3 • assets)</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <style>
+    :root{--bg:#ffffff;--card:#ffffff;--card-2:#f8fafc;--muted:#475569;--text:#0f172a;--accent:#2563eb;--accent-2:#16a34a;--warning:#f59e0b;--danger:#ef4444;--success:#10b981;--border:#e2e8f0;--shadow:0 6px 20px rgba(15,23,42,.08);--radius:14px;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,'Noto Sans',sans-serif;background:#fff;color:var(--text)}
+    header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--border)}
+    .container{max-width:1200px;margin:0 auto;padding:20px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .brand .logo{width:36px;height:36px;border-radius:10px;background:conic-gradient(from 180deg,#60a5fa,#22c55e,#f59e0b,#60a5fa);box-shadow:inset 0 0 12px rgba(0,0,0,.05)}
+    .brand h1{font-size:18px;margin:0;font-weight:650;letter-spacing:.2px}
+
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .tab{padding:10px 14px;border:1px solid var(--border);border-radius:999px;background:#fff;color:#0f172a;cursor:pointer;transition:.2s;user-select:none}
+    .tab[aria-selected="true"],.tab:hover{border-color:var(--accent);box-shadow:0 0 0 2px rgba(37,99,235,.12)}
+
+    main{padding-block:16px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+    .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .card h2{margin:0 0 10px 0;font-size:18px}
+    .card .hd{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--border)}
+    .card .bd{padding:16px}
+    .muted{color:var(--muted)}
+
+    label{display:block;margin:.5rem 0 .25rem;font-size:.92rem;color:#334155}
+    input, select, textarea{width:100%;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid var(--border);color:var(--text);outline:none}
+    input:focus, select:focus, textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+    .row{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
+    .col-6{grid-column:span 6}
+    .col-4{grid-column:span 4}
+    .col-5{grid-column:span 5}
+    .col-7{grid-column:span 7}
+    .col-8{grid-column:span 8}
+    .col-12{grid-column:span 12}
+    @media (max-width:980px){.col-6,.col-4,.col-5,.col-7,.col-8{grid-column:span 12}}
+
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#2563eb;color:#fff;cursor:pointer}
+    .btn:hover{filter:brightness(1.05)}
+    .btn.primary{background:#1d4ed8;border-color:#1d4ed8}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#f8fafc;font-size:.8rem}
+
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#f1f5f9;font-size:.85rem}
+    .chip img{height:16px;display:block}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+    .progress{width:100%;height:10px;border-radius:999px;background:#f1f5f9;border:1px solid var(--border);overflow:hidden}
+    .progress>div{height:100%;background:linear-gradient(90deg,#60a5fa,#93c5fd);}
+
+    .chat{display:flex;flex-direction:column;gap:10px;max-height:320px;overflow:auto;padding-right:4px}
+    .bubble{max-width:76%;padding:10px 12px;border-radius:14px;line-height:1.3}
+    .me{align-self:flex-end;background:#dbeafe;border:1px solid #bfdbfe;color:#0f172a}
+    .bot{align-self:flex-start;background:#f1f5f9;border:1px solid #e2e8f0;color:#0f172a}
+
+    .timeline{position:relative;padding-left:20px}
+    .timeline:before{content:"";position:absolute;left:8px;top:0;bottom:0;width:2px;background:#e2e8f0}
+    .milestone{position:relative;margin:14px 0;padding-left:14px}
+    .milestone:before{content:"";position:absolute;left:-2px;top:4px;width:10px;height:10px;border-radius:50%;background:#60a5fa;box-shadow:0 0 0 3px rgba(96,165,250,.25)}
+
+    footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);padding:18px;margin-top:12px}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#f8fafc;border:1px solid var(--border);padding:2px 6px;border-radius:6px}
+    #map{border:1px solid var(--border);border-radius:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="brand" aria-label="PI Nexus">
+        <div class="logo" aria-hidden="true"></div>
+        <h1>PI Nexus — Idea#1 Prototype (v3 • assets)</h1>
+        <div class="badges" style="display:flex;gap:12px;margin-left:auto;align-items:center">
+          <img src="assets/pi-logo.png" alt="PI Industries" height="28" onerror="this.onerror=null;this.src='sandbox:/mnt/data/pi-logo.png'"/>
+          <img src="assets/immunoact-logo.png" alt="ImmunoACT" height="24" onerror="this.onerror=null;this.src='sandbox:/mnt/data/immunoact-logo.png'"/>
+          <img src="assets/tmc-logo.png" alt="Tata Memorial Centre" height="28" onerror="this.onerror=null;this.src='sandbox:/mnt/data/tmc-logo.png'"/>
+        </div>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="Primary Views">
+        <button class="tab" role="tab" id="tab-patient" aria-controls="panel-patient" aria-selected="true">Patient</button>
+        <button class="tab" role="tab" id="tab-doctor" aria-controls="panel-doctor" aria-selected="false">Doctor</button>
+        <button class="tab" role="tab" id="tab-rnd" aria-controls="panel-rnd" aria-selected="false">R&D</button>
+      </nav>
+      <div class="ui-tools" style="display:flex;gap:16px;align-items:center;margin-top:10px">
+        <label class="muted" style="display:flex;align-items:center;gap:8px">Text size
+          <input id="fontRange" type="range" min="90" max="120" value="100" style="width:160px"/>
+        </label>
+        <label class="muted" style="display:flex;align-items:center;gap:8px"><input id="hcToggle" type="checkbox"/> High contrast</label>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- PATIENT PANEL -->
+    <section id="panel-patient" role="tabpanel" aria-labelledby="tab-patient">
+      <div class="grid">
+        <!-- Patient Profile (Dummy Template) -->
+        <article class="card col-12">
+          <div class="bd">
+            <div class="row">
+              <div class="col-8">
+                <h2 style="margin:0 0 6px 0">Patient Profile (Template)</h2>
+                <div class="muted" style="margin-bottom:4px">Name: <strong>Aarav Sharma</strong> • MRN: <strong>TMH-23-0912</strong> • Age: 42 • Dx: DLBCL • Stage II</div>
+                <div class="muted" style="margin-bottom:6px;display:flex;align-items:center;gap:8px">
+                  <img src="assets/tmc-logo.png" alt="Tata Memorial" height="22" onerror="this.onerror=null;this.src='sandbox:/mnt/data/tmc-logo.png'"/> Treated at: <strong>Tata Memorial Hospital, Parel</strong>
+                </div>
+                <div class="muted">Address: 302, A-Wing, Ashoka Residency, Parel, Mumbai — 400012</div>
+                <div class="muted">Phone: +91-90000-12345 • Email: aarav.sharma@example.com</div>
+                <div class="muted">Primary Oncologist: Dr. Mehta • Emergency Contact: Riya Sharma (Spouse) +91-98xxxxxx12</div>
+                <div style="margin-top:8px">
+                  <div class="muted">Current Regimen</div>
+                  <div class="chips">
+                    <span class="chip"><strong>Breyanzi</strong> (lisocabtagene maraleucel)</span>
+                    <span class="chip"><img src="assets/immunoact-logo.png" alt="ImmunoACT" onerror="this.onerror=null;this.src='sandbox:/mnt/data/immunoact-logo.png'"/> ImmunoACT — CD19 CAR-T</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="card" style="background:#f8fafc"><div class="bd">
+                  <div class="muted">Insurer</div>
+                  <div><strong>LIC Health Plus</strong> — Plan: <strong>Silver PPO</strong></div>
+                  <div class="muted">Co-insurance 20% • Deductible ₹20,000 • OOP Max ₹80,000</div>
+                </div></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Affordability & Eligibility -->
+        <article class="card col-7">
+          <div class="hd">
+            <div>
+              <h2>Affordability & Eligibility</h2>
+              <div class="muted">Estimate out-of-pocket cost and check PI Assistance eligibility.</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;color:var(--muted)">Patient Template</div>
+              <div><strong id="p-name">Aarav Sharma</strong> • MRN <span id="p-mrn">TMH-23-0912</span></div>
+              <div class="muted">Age 42 • DLBCL • Insurer: <span id="p-ins">LIC Health Plus</span></div>
+            </div>
+          </div>
+          <div class="bd">
+            <form id="aff-form" autocomplete="on">
+              <div class="row">
+                <div class="col-6">
+                  <label for="insurer">Insurer</label>
+                  <select id="insurer" required>
+                    <option value="">Select</option>
+                    <option selected>LIC Health Plus</option>
+                    <option>Star Health & Allied</option>
+                    <option>HDFC ERGO Health</option>
+                    <option>ICICI Lombard</option>
+                    <option>Niva Bupa (Max Bupa)</option>
+                    <option>Aditya Birla Health</option>
+                    <option>Care Health (Religare)</option>
+                    <option>United India Insurance</option>
+                    <option>New India Assurance</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="col-6">
+                  <label for="plan">Plan Type</label>
+                  <select id="plan" required>
+                    <option value="HMO">HMO</option>
+                    <option value="PPO" selected>PPO</option>
+                    <option value="HDHP">HDHP</option>
+                  </select>
+                </div>
+                <div class="col-4">
+                  <label for="deductible">Annual Deductible (₹)</label>
+                  <input type="number" id="deductible" min="0" step="500" value="20000" required />
+                </div>
+                <div class="col-4">
+                  <label for="oopmax">OOP Max (₹)</label>
+                  <input type="number" id="oopmax" min="0" step="500" value="80000" required />
+                </div>
+                <div class="col-4">
+                  <label for="coins">Co-insurance (%)</label>
+                  <input type="number" id="coins" min="0" max="100" value="20" required />
+                </div>
+                <div class="col-6">
+                  <label for="therapyCost">Therapy Monthly Cost (₹)</label>
+                  <input type="number" id="therapyCost" min="0" step="500" value="30000" required />
+                </div>
+                <div class="col-6">
+                  <label for="months">Treatment Months</label>
+                  <input type="number" id="months" min="1" max="24" value="6" required />
+                </div>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <button class="btn primary" type="submit">Calculate</button>
+                <span class="muted">Pro-tip: press <span class="kbd">Enter</span> to run.</span>
+              </div>
+            </form>
+            <div id="aff-results" style="margin-top:14px;display:none">
+              <div class="row">
+                <div class="col-6">
+                  <div class="stat">Estimated total OOP: <strong id="res-total" style="margin-left:6px">—</strong></div>
+                </div>
+                <div class="col-6">
+                  <div class="stat">Estimated monthly OOP: <strong id="res-month" style="margin-left:6px">—</strong></div>
+                </div>
+              </div>
+              <div class="row" style="margin-top:10px">
+                <div class="col-12">
+                  <div class="progress" aria-label="Coverage progress to OOP Max">
+                    <div id="prog" style="width:0%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr style="border:none;border-top:1px solid var(--border);margin:18px 0" />
+
+            <form id="elig-form">
+              <h3 style="margin:0 0 8px 0">CART Patient Assistance (PI) — Eligibility</h3>
+              <div class="row">
+                <div class="col-4">
+                  <label for="income">Annual Household Income (₹)</label>
+                  <input type="number" id="income" min="0" step="5000" value="600000" required />
+                </div>
+                <div class="col-4">
+                  <label for="household">Household Size</label>
+                  <input type="number" id="household" min="1" value="3" required />
+                </div>
+                <div class="col-4">
+                  <label for="diagnosis">Diagnosis Category</label>
+                  <select id="diagnosis">
+                    <option selected>Oncology</option>
+                    <option>Autoimmune</option>
+                    <option>Infectious</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <button class="btn" type="submit">Check Eligibility</button>
+                <span id="elig-out" class="pill">Not checked</span>
+              </div>
+            </form>
+          </div>
+        </article>
+
+        <!-- Daily Tracker Chatbot -->
+        <article class="card col-5">
+          <div class="hd">
+            <div>
+              <h2>Daily Patient Tracker</h2>
+              <div class="muted">Quick replies + text; rule-based safety flags.</div>
+            </div>
+            <div class="pill" id="tracker-status">Day 1</div>
+          </div>
+          <div class="bd">
+            <div id="quick" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+            <div class="chat" id="chat" aria-live="polite"></div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <input id="msg" placeholder="Type your response…" aria-label="Patient response" />
+              <button class="btn" id="send">Send</button>
+            </div>
+            <div style="margin-top:8px" class="muted">Saved locally. Export with <button class="btn" id="export" type="button">Export JSON</button></div>
+          </div>
+        </article>
+
+        <!-- Vial Location Tracker -->
+        <article class="card col-12">
+          <div class="hd">
+            <div>
+              <h2>Vial Journey (PI Lab ⇢ Tata Memorial Hospital)</h2>
+              <div class="muted">India map with labelled nodes + courier-style timeline (no precise geo-tracking).</div>
+            </div>
+            <div class="pill" id="loc-status">In transit</div>
+          </div>
+          <div class="bd">
+            <div class="row">
+              <div class="col-7">
+                <div id="map" style="height:420px"></div>
+                <div class="timeline" id="timeline" style="margin-top:12px"></div>
+              </div>
+              <div class="col-5">
+                <div class="card" style="background:#f8fafc"><div class="bd">
+                  <h3 style="margin:0 0 8px 0">Batch Snapshot</h3>
+                  <div class="muted">Batch: <strong id="batch-id">PI-ALPHA-0017</strong></div>
+                  <div class="muted">ETA to TMH Parel: <strong id="eta">—</strong></div>
+                  <div class="muted">Route: Udaipur → Panoli (Bharuch) → Ahmedabad → Mumbai (TMH)</div>
+                  <div class="muted" style="margin-top:8px">Cold-chain telemetry</div>
+                  <ul style="margin:6px 0 0 16px;color:#334155">
+                    <li>LN2 Temp: <strong id="m-temp">—</strong></li>
+                    <li>Shocks (24h): <strong id="m-shock">—</strong></li>
+                    <li>Battery: <strong id="m-batt">—</strong></li>
+                    <li>Remaining distance: <strong id="m-dist">—</strong></li>
+                  </ul>
+                  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                    <button class="btn" id="step-forward">Advance Status</button>
+                    <button class="btn" id="reset-trk">Reset</button>
+                  </div>
+                </div></div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- DOCTOR PANEL -->
+    <section id="panel-doctor" role="tabpanel" aria-labelledby="tab-doctor" hidden>
+      <div class="grid">
+        <article class="card col-8">
+          <div class="hd"><h2>Patient Cohort Overview</h2><span class="pill">Prototype</span></div>
+          <div class="bd">
+            <p class="muted">Adherence, adverse events, and affordability flags populated from patient tracker.</p>
+            <div class="row">
+              <div class="col-4"><div class="card"><div class="bd"><div class="muted">Adherence ≥ 90%</div><h3 id="d-adh">—</h3></div></div></div>
+              <div class="col-4"><div class="card"><div class="bd"><div class="muted">Adverse Events (7d)</div><h3 id="d-ae">—</h3></div></div></div>
+              <div class="col-4"><div class="card"><div class="bd"><div class="muted">Affordability Risk</div><h3 id="d-aff">—</h3></div></div></div>
+            </div>
+          </div>
+        </article>
+        <article class="card col-4">
+          <div class="hd"><h2>Actions</h2></div>
+          <div class="bd">
+            <button class="btn" onclick="alert('eRx renewal triggered (mock).')">Trigger eRx Renewal</button>
+            <button class="btn" onclick="alert('Care call scheduled (mock).')">Schedule Care Call</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- R&D PANEL -->
+    <section id="panel-rnd" role="tabpanel" aria-labelledby="tab-rnd" hidden>
+      <div class="grid">
+        <article class="card col-12">
+          <div class="hd"><h2>Supply & Trial Ops (Demo)</h2><span class="pill">Read-only</span></div>
+          <div class="bd">
+            <p class="muted">Track batches across nodes (PI Lab → QA → 3PL → TMH) with event stamps. Prototype only.</p>
+            <div class="row">
+              <div class="col-6">
+                <label>Batch</label>
+                <select id="rnd-batch"></select>
+              </div>
+              <div class="col-6">
+                <label>Current Node</label>
+                <input id="rnd-node" readonly />
+              </div>
+              <div class="col-12">
+                <label>Events</label>
+                <textarea id="rnd-events" rows="6" readonly></textarea>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container">
+    <div>© 2025 PI Nexus (Prototype). For demo only — no real PHI stored. Data saved to your browser <em>localStorage</em>.</div>
+  </footer>
+
+  <script>
+    const $ = (q)=>document.querySelector(q);
+    const fmt = (n)=> new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n);
+
+    // Tabs
+    const tabs = ["patient","doctor","rnd"];
+    tabs.forEach(id=>{ const t=$(`#tab-${id}`); t.addEventListener('click',()=>{ tabs.forEach(x=>{ $(`#tab-${x}`).setAttribute('aria-selected', x===id); const p=$(`#panel-${x}`); if(x===id){p.removeAttribute('hidden')} else {p.setAttribute('hidden','')} }) }) })
+
+    // Affordability
+    const affForm = $('#aff-form');
+    const affOut = $('#aff-results');
+    affForm.addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const deductible=+$('#deductible').value; const oopmax=+$('#oopmax').value; const coins=+$('#coins').value/100; const therapy=+$('#therapyCost').value; const months=+$('#months').value;
+      let remainingDed=deductible, totalOOP=0;
+      for(let m=0;m<months;m++){
+        let paid=0, covered=0; if(remainingDed>0){ const toDed=Math.min(therapy,remainingDed); paid+=toDed; remainingDed-=toDed; covered+=toDed; }
+        const post= Math.max(0, therapy - covered); paid += post*coins; if(totalOOP+paid>oopmax){ paid = Math.max(0, oopmax-totalOOP); } totalOOP += paid; if(totalOOP>=oopmax) break;
+      }
+      const monthlyOOP=Math.ceil(totalOOP/months);
+      $('#res-total').textContent=fmt(totalOOP); $('#res-month').textContent=fmt(monthlyOOP); $('#prog').style.width=Math.min(100,Math.round((totalOOP/oopmax)*100))+'%'; affOut.style.display='block';
+      localStorage.setItem('affRisk', totalOOP>(0.6*oopmax)?'High':'Moderate'); updateDoctorTiles();
+    })
+
+    // Assistance
+    $('#elig-form').addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const income=+$('#income').value, hh=+$('#household').value, diag=$('#diagnosis').value;
+      const deductible=+$('#deductible').value, oopmax=+$('#oopmax').value, coins=+$('#coins').value/100, therapy=+$('#therapyCost').value, months=+$('#months').value;
+      let remainingDed=deductible, totalOOP=0; for(let m=0;m<months;m++){ let paid=0, covered=0; if(remainingDed>0){ const toDed=Math.min(therapy,remainingDed); paid+=toDed; remainingDed-=toDed; covered+=toDed; } const post=Math.max(0,therapy-covered); paid+=post*coins; if(totalOOP+paid>oopmax){ paid=Math.max(0,oopmax-totalOOP);} totalOOP+=paid; if(totalOOP>=oopmax) break; }
+      const annualOOP=totalOOP; let fullT=900000+Math.max(0,hh-1)*200000, partT=1300000+Math.max(0,hh-1)*250000; if(diag==='Oncology'){ fullT*=1.1; partT*=1.1; }
+      let tier='Not Eligible'; if(income<=fullT) tier='Full Aid'; else if(income<=partT) tier='Partial Aid'; else { const burden=annualOOP/Math.max(1,income); if(burden>=0.4) tier='Partial Aid'; }
+      const pill=$('#elig-out'); pill.textContent=`${tier} • Est. OOP ${fmt(Math.round(annualOOP))}`; pill.style.borderColor=tier==='Full Aid'?'var(--accent-2)':(tier==='Partial Aid'?'#f59e0b':'var(--danger)'); pill.style.background=tier==='Full Aid'?'rgba(22,163,74,.1)':(tier==='Partial Aid'?'rgba(245,158,11,.1)':'rgba(239,68,68,.1)');
+      localStorage.setItem('elig', tier); updateDoctorTiles();
+    })
+
+    // Tracker (quick replies)
+    const chat=$('#chat'), quick=$('#quick');
+    const steps=[
+      {k:'mood', q:'How are you feeling today?', options:['great','okay','bad']},
+      {k:'pain', q:'Pain level (0-10)?'},
+      {k:'temp', q:'Temperature (°C)?'},
+      {k:'dose', q:'Did you take your dose?', options:['yes','no']},
+      {k:'sym',  q:'Any symptoms to note? (nausea, rash, etc.)', options:['none','nausea','rash','vomit']}
+    ];
+    let ix=0; const dayKey='trackerDay', dataKey='trackerData';
+    const loadDay=()=>+(localStorage.getItem(dayKey)||1); const saveDay=(n)=>localStorage.setItem(dayKey,String(n)); const saveData=(o)=>localStorage.setItem(dataKey,JSON.stringify(o)); const getData=()=>JSON.parse(localStorage.getItem(dataKey)||'{}');
+    function bot(t){ const b=document.createElement('div'); b.className='bubble bot'; b.textContent=t; chat.appendChild(b); chat.scrollTop=chat.scrollHeight; }
+    function me(t){ const b=document.createElement('div'); b.className='bubble me'; b.textContent=t; chat.appendChild(b); chat.scrollTop=chat.scrollHeight; }
+    function renderQuick(){ quick.innerHTML=''; (steps[ix].options||[]).forEach(o=>{ const btn=document.createElement('button'); btn.className='btn'; btn.type='button'; btn.textContent=o; btn.addEventListener('click',()=>submitAnswer(o)); quick.appendChild(btn); }) }
+    function next(){ ix++; if(ix<steps.length){ bot(steps[ix].q); renderQuick(); } else { bot('Thanks! Logged for today. See you tomorrow.'); quick.innerHTML=''; saveDay(loadDay()+1); $('#tracker-status').textContent=`Day ${loadDay()}`; } updateDoctorTiles(); }
+    function submitAnswer(val){ if(!val) return; me(val); const d=getData(); const step=steps[ix]; const key=`day${loadDay()}`; d[key]=d[key]||{}; d[key][step.k]=val; saveData(d); if(step.k==='temp'&&+val>=38){ bot('Fever (≥38°C). Please hydrate and contact your care team if persists.'); } if(step.k==='pain'&&+val>=7){ bot('High pain noted. Use prescribed analgesic and inform your doctor.'); } if(step.k==='dose'&&String(val).toLowerCase()==='no'){ bot('Dose missed. Please specify reason in the text box.'); } if(step.k==='sym'&&/(vomit|faint|bleed|rash|breath)/i.test(String(val))){ bot('Concerning symptom captured. If severe, visit ER and notify your care team.'); } setTimeout(next,250); }
+    function handleSend(){ const v=$('#msg').value.trim(); if(!v) return; $('#msg').value=''; submitAnswer(v); }
+    $('#send').addEventListener('click',handleSend); $('#msg').addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); handleSend(); } })
+    function startDay(){ ix=0; chat.innerHTML=''; quick.innerHTML=''; bot(steps[ix].q); renderQuick(); $('#tracker-status').textContent=`Day ${loadDay()}`; }
+    startDay();
+
+    // Vial route + Leaflet
+    const route=[
+      {label:'QA Release — PI Bioprocess Lab (Udaipur)', ts:+new Date()-1000*60*60*30, lat:24.5854, lon:73.7125},
+      {label:'3PL Handover — Panoli DC (Bharuch)',      ts:+new Date()-1000*60*60*20, lat:21.6920, lon:72.9780},
+      {label:'Regional Cold Hub — Ahmedabad',           ts:+new Date()-1000*60*60*10, lat:23.0225, lon:72.5714},
+      {label:'Linehaul to Mumbai (NH48) — In Transit',  ts:+new Date()-1000*60*60*2,  lat:19.0760, lon:72.8777},
+      {label:'Arrived — Tata Memorial Hospital, Parel', ts:null,                        lat:18.9940, lon:72.8397}
+    ];
+    let cur=3;
+    function renderTimeline(){ const tl=$('#timeline'); tl.innerHTML=''; route.forEach((r,i)=>{ const d=document.createElement('div'); d.className='milestone'; const when=r.ts? new Date(r.ts).toLocaleString(): '—'; d.innerHTML=`<div><strong>${r.label}</strong><div class=\"muted\">${when}</div></div>`; d.style.opacity=i<=cur?1:.55; tl.appendChild(d); }); $('#loc-status').textContent = cur<route.length-1? 'In transit':'Delivered'; const base=route[cur].ts||Date.now(); $('#eta').textContent = cur<route.length-1? new Date(base+1000*60*60*4).toLocaleString(): 'Delivered'; }
+    renderTimeline();
+
+    let map, poly, markers=[]; const pts=route.map(r=>[r.lat,r.lon]);
+    function initMap(){ map=L.map('map',{scrollWheelZoom:false}).setView([22.5,78.9],5); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map); poly=L.polyline(pts,{color:'#2563eb',weight:4,opacity:0.9}).addTo(map); route.forEach((r,i)=>{ const m=L.marker([r.lat,r.lon]).addTo(map).bindTooltip(r.label,{permanent:true,offset:[0,-16],direction:'top'}); markers.push(m); }); map.fitBounds(poly.getBounds(),{padding:[20,20]}); updateMapProgress(); }
+    function haversine(a,b){ const R=6371; const toRad=(x)=>x*Math.PI/180; const dLat=toRad(b[0]-a[0]); const dLon=toRad(b[1]-a[1]); const lat1=toRad(a[0]); const lat2=toRad(b[0]); const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2; return 2*R*Math.asin(Math.sqrt(h)); }
+    function updateMetrics(){ const curr=[route[Math.min(cur,route.length-1)].lat,route[Math.min(cur,route.length-1)].lon]; const dest=[route[route.length-1].lat,route[route.length-1].lon]; const remain=haversine(curr,dest); $('#m-dist').textContent=remain.toFixed(1)+' km'; $('#m-temp').textContent='-152°C'; $('#m-shock').textContent='0.6 g'; $('#m-batt').textContent='82%'; }
+    function updateMapProgress(){ if(!map) return; markers.forEach((m,i)=> m.setOpacity(i<=cur?1:0.35)); poly.setLatLngs(pts); updateMetrics(); }
+    initMap();
+
+    $('#step-forward').addEventListener('click',()=>{ if(cur<route.length-1){ cur++; route[cur].ts=Date.now(); renderTimeline(); updateMapProgress(); } });
+    $('#reset-trk').addEventListener('click',()=>{ cur=0; route.forEach((r,i)=>{ r.ts= i===0? Date.now(): null; }); renderTimeline(); updateMapProgress(); });
+
+    // Doctor tiles
+    function updateDoctorTiles(){ const data=JSON.parse(localStorage.getItem('trackerData')||'{}'); const days=Object.values(data); const adherent=days.filter(d=>String(d.dose||'').toLowerCase()==='yes').length; const adh=days.length? Math.round((adherent/days.length)*100):0; $('#d-adh').textContent=adh+'%'; const ae=days.filter(d=>(+(d.pain||0)>=6)||/(vomit|rash|faint|bleed)/i.test(String(d.sym||''))).length; $('#d-ae').textContent=ae; $('#d-aff').textContent=localStorage.getItem('affRisk')||'—'; }
+    updateDoctorTiles();
+
+    // UI tools
+    const fontRange=document.getElementById('fontRange'); fontRange.addEventListener('input',()=>{ document.documentElement.style.fontSize=fontRange.value+'%'; }); const hcToggle=document.getElementById('hcToggle'); hcToggle.addEventListener('change',()=>{ document.body.classList.toggle('high-contrast',hcToggle.checked); document.documentElement.style.setProperty('--border', hcToggle.checked?'#334155':'#e2e8f0'); document.documentElement.style.setProperty('--muted', hcToggle.checked?'#111827':'#475569'); });
+
+    // R&D demo
+    const rndBatches=[{id:'PI-ALPHA-0017', node:'In Transit', events:['2025-10-10 09:12: QA release (PI Lab Udaipur)','2025-10-10 13:40: 3PL pickup (Panoli DC, Bharuch)','2025-10-11 02:05: Arrived Regional Hub (Ahmedabad)','2025-10-12 07:20: Linehaul departed to TMH Parel (Mumbai)']},{id:'PI-BETA-0042', node:'At Regional Hub', events:['2025-10-09 18:22: QA release (Hyderabad Lab)','2025-10-10 06:30: 3PL pickup','2025-10-11 21:15: Arrived Regional Hub (Pune)']}];
+    const sel=$('#rnd-batch'); rndBatches.forEach(b=>{ const o=document.createElement('option'); o.textContent=b.id; o.value=b.id; sel.appendChild(o); }); function renderRND(){ const b=rndBatches.find(x=>x.id===sel.value)||rndBatches[0]; $('#rnd-node').value=b.node; $('#rnd-events').value=b.events.join('\n'); } sel.addEventListener('change',renderRND); renderRND();
+  </script>
+</body>
+</html>
